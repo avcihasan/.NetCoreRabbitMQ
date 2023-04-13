@@ -28,23 +28,45 @@ using System.Text;
 #endregion
 
 #region DirectExchange
+//ConnectionFactory factory = new();
+//factory.Uri = new("amqps://dqmpnror:GjrEnPhUvvnz4LGpp_CneJ0HFQujHrTt@puffin.rmq2.cloudamqp.com/dqmpnror");
+
+//using IConnection connection = factory.CreateConnection();
+//using IModel channel = connection.CreateModel();
+
+//channel.ExchangeDeclare(exchange:"dirext-exchange-example",type:ExchangeType.Direct);
+
+//while (true)
+//{
+//    string message = Console.ReadLine();
+//    byte[] byteMessage = Encoding.UTF8.GetBytes(message);
+
+//    channel.BasicPublish(
+//        exchange: "dirext-exchange-example",
+//        routingKey: "dirext-queue-example",
+//        body:byteMessage
+//        );
+//}
+#endregion
+
+#region FanoutExchange
 ConnectionFactory factory = new();
 factory.Uri = new("amqps://dqmpnror:GjrEnPhUvvnz4LGpp_CneJ0HFQujHrTt@puffin.rmq2.cloudamqp.com/dqmpnror");
 
-using IConnection connection = factory.CreateConnection();
-using IModel channel = connection.CreateModel();
+using IConnection connection =factory.CreateConnection();
+using IModel channel= connection.CreateModel();
 
-channel.ExchangeDeclare(exchange:"dirext-exchange-example",type:ExchangeType.Direct);
+channel.ExchangeDeclare(exchange:"fanout-exhcange-example",type:ExchangeType.Fanout);
 
-while (true)
+for (int i = 0; i < 100; i++)
 {
-    string message = Console.ReadLine();
-    byte[] byteMessage = Encoding.UTF8.GetBytes(message);
+    await Task.Delay(250);
+    byte[] message = Encoding.UTF8.GetBytes($"Fanout Excahne {i}");
 
     channel.BasicPublish(
-        exchange: "dirext-exchange-example",
-        routingKey: "dirext-queue-example",
-        body:byteMessage
-        );
+        exchange: "fanout-exhcange-example",
+        routingKey: String.Empty, 
+        body: message);
 }
+Console.Read();
 #endregion
