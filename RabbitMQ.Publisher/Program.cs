@@ -50,23 +50,48 @@ using System.Text;
 #endregion
 
 #region FanoutExchange
-ConnectionFactory factory = new();
+//ConnectionFactory factory = new();
+//factory.Uri = new("amqps://dqmpnror:GjrEnPhUvvnz4LGpp_CneJ0HFQujHrTt@puffin.rmq2.cloudamqp.com/dqmpnror");
+
+//using IConnection connection =factory.CreateConnection();
+//using IModel channel= connection.CreateModel();
+
+//channel.ExchangeDeclare(exchange:"fanout-exhcange-example",type:ExchangeType.Fanout);
+
+//for (int i = 0; i < 100; i++)
+//{
+//    await Task.Delay(250);
+//    byte[] message = Encoding.UTF8.GetBytes($"Fanout Excahne {i}");
+
+//    channel.BasicPublish(
+//        exchange: "fanout-exhcange-example",
+//        routingKey: String.Empty, 
+//        body: message);
+//}
+//Console.Read();
+#endregion
+
+#region TopicExchange
+ConnectionFactory factory= new();
 factory.Uri = new("amqps://dqmpnror:GjrEnPhUvvnz4LGpp_CneJ0HFQujHrTt@puffin.rmq2.cloudamqp.com/dqmpnror");
 
-using IConnection connection =factory.CreateConnection();
-using IModel channel= connection.CreateModel();
+using IConnection connection = factory.CreateConnection();  
+using IModel channel = connection.CreateModel();
 
-channel.ExchangeDeclare(exchange:"fanout-exhcange-example",type:ExchangeType.Fanout);
+channel.ExchangeDeclare(exchange:"topic-exchange-example",type:ExchangeType.Topic);
 
 for (int i = 0; i < 100; i++)
 {
     await Task.Delay(250);
-    byte[] message = Encoding.UTF8.GetBytes($"Fanout Excahne {i}");
+    byte[] message = Encoding.UTF8.GetBytes($"Topic Exchange {i}");
 
+    Console.Write("Topic gir : ");
+    string topic = Console.ReadLine();
     channel.BasicPublish(
-        exchange: "fanout-exhcange-example",
-        routingKey: String.Empty, 
-        body: message);
+        exchange: "topic-exchange-example",
+        routingKey: topic,
+        body:message);
+
 }
 Console.Read();
 #endregion
