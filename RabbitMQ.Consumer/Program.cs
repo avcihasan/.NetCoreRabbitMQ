@@ -98,31 +98,65 @@ using System.Text;
 
 
 #region TopicExchange
+//ConnectionFactory factory = new();
+//factory.Uri = new("amqps://dqmpnror:GjrEnPhUvvnz4LGpp_CneJ0HFQujHrTt@puffin.rmq2.cloudamqp.com/dqmpnror");
+
+//using IConnection connection = factory.CreateConnection();  
+//using IModel channel = connection.CreateModel();
+
+//channel.ExchangeDeclare(exchange:"topic-exchange-example",type:ExchangeType.Topic);
+
+//string queuName = channel.QueueDeclare().QueueName;
+
+//Console.Write("Topic gir : ");
+//string topic = Console.ReadLine();
+
+//channel.QueueBind(
+//    queue:queuName,
+//    exchange: "topic-exchange-example",
+//    routingKey:topic);
+
+//EventingBasicConsumer consumer = new(channel);
+//channel.BasicConsume(queue:queuName,autoAck:true,consumer);
+
+//consumer.Received += (sender, e) =>
+//{
+//    string message = Encoding.UTF8.GetString(e.Body.Span);
+//    Console.WriteLine(message);
+//};
+//Console.Read();
+#endregion
+
+#region HeaderExcahnge
 ConnectionFactory factory = new();
 factory.Uri = new("amqps://dqmpnror:GjrEnPhUvvnz4LGpp_CneJ0HFQujHrTt@puffin.rmq2.cloudamqp.com/dqmpnror");
 
-using IConnection connection = factory.CreateConnection();  
-using IModel channel = connection.CreateModel();
+using IConnection connection=factory.CreateConnection();
+using IModel channel= connection.CreateModel();
 
-channel.ExchangeDeclare(exchange:"topic-exchange-example",type:ExchangeType.Topic);
+channel.ExchangeDeclare(exchange:"header-exchange-example",type:ExchangeType.Headers);
 
-string queuName = channel.QueueDeclare().QueueName;
+Console.Write("Header Value değeri : ");
+string value = Console.ReadLine();
 
-Console.Write("Topic gir : ");
-string topic = Console.ReadLine();
 
+string queueName =channel.QueueDeclare().QueueName;
 channel.QueueBind(
-    queue:queuName,
-    exchange: "topic-exchange-example",
-    routingKey:topic);
-
+    queue:queueName, 
+    "header-exchange-example", 
+    routingKey: String.Empty, 
+    new Dictionary<string,object>() 
+    { 
+        ["no"]=value
+    }
+    );
 EventingBasicConsumer consumer = new(channel);
-channel.BasicConsume(queue:queuName,autoAck:true,consumer);
+channel.BasicConsume(queue:queueName,autoAck:true,consumer:consumer);
 
 consumer.Received += (sender, e) =>
 {
-    string message = Encoding.UTF8.GetString(e.Body.Span);
-    Console.WriteLine(message);
+    string mesaage = Encoding.UTF8.GetString(e.Body.Span);
+    Console.WriteLine(mesaage);
 };
 Console.Read();
 #endregion

@@ -72,26 +72,64 @@ using System.Text;
 #endregion
 
 #region TopicExchange
+//ConnectionFactory factory= new();
+//factory.Uri = new("amqps://dqmpnror:GjrEnPhUvvnz4LGpp_CneJ0HFQujHrTt@puffin.rmq2.cloudamqp.com/dqmpnror");
+
+//using IConnection connection = factory.CreateConnection();  
+//using IModel channel = connection.CreateModel();
+
+//channel.ExchangeDeclare(exchange:"topic-exchange-example",type:ExchangeType.Topic);
+
+//for (int i = 0; i < 100; i++)
+//{
+//    await Task.Delay(250);
+//    byte[] message = Encoding.UTF8.GetBytes($"Topic Exchange {i}");
+
+//    Console.Write("Topic gir : ");
+//    string topic = Console.ReadLine();
+//    channel.BasicPublish(
+//        exchange: "topic-exchange-example",
+//        routingKey: topic,
+//        body:message);
+
+//}
+//Console.Read();
+#endregion
+
+#region HeaderExcahnge
 ConnectionFactory factory= new();
 factory.Uri = new("amqps://dqmpnror:GjrEnPhUvvnz4LGpp_CneJ0HFQujHrTt@puffin.rmq2.cloudamqp.com/dqmpnror");
 
-using IConnection connection = factory.CreateConnection();  
+using IConnection connection = factory.CreateConnection();
 using IModel channel = connection.CreateModel();
 
-channel.ExchangeDeclare(exchange:"topic-exchange-example",type:ExchangeType.Topic);
+channel.ExchangeDeclare(exchange:"header-exchange-example",type:ExchangeType.Headers);
 
 for (int i = 0; i < 100; i++)
 {
     await Task.Delay(250);
-    byte[] message = Encoding.UTF8.GetBytes($"Topic Exchange {i}");
 
-    Console.Write("Topic gir : ");
-    string topic = Console.ReadLine();
+    byte[] message = Encoding.UTF8.GetBytes($"Header Exchange {i}");
+
+    Console.Write("Header Value değeri : ");
+    string value = Console.ReadLine();
+
+    //header değerleri oluşturma
+    IBasicProperties properties= channel.CreateBasicProperties();
+    properties.Headers=new Dictionary<string, object>()
+    {
+        ["no"]=value
+    };
+    // headers tüm exchangelerde mevcuttur fakar bind işlemi header ile yapılıyorsa bu header exchangedir.
+
+
     channel.BasicPublish(
-        exchange: "topic-exchange-example",
-        routingKey: topic,
-        body:message);
-
+        exchange: "header-exchange-example",
+        routingKey:String.Empty,
+        body:message,
+       basicProperties:properties
+        );;
 }
+
 Console.Read();
 #endregion
